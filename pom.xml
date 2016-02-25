@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.adscale.logback</groupId>
     <artifactId>logback-kafka-appender</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
