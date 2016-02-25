@@ -9,6 +9,7 @@ import ch.qos.logback.core.status.ErrorStatus;
 import com.github.danielwegener.logback.kafka.delivery.DeliveryStrategy;
 import com.github.danielwegener.logback.kafka.delivery.FailedDeliveryCallback;
 import com.github.danielwegener.logback.kafka.encoding.KafkaMessageEncoder;
+import com.github.danielwegener.logback.kafka.encoding.KafkaMessageEncoderBase;
 import com.github.danielwegener.logback.kafka.keying.KeyingStrategy;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -30,7 +31,7 @@ public class KafkaAppenderTest {
     private final KafkaAppender<ILoggingEvent> unit = new KafkaAppender<ILoggingEvent>();
     private final LoggerContext ctx = new LoggerContext();
     @SuppressWarnings("unchecked")
-    private final KafkaMessageEncoder<ILoggingEvent> encoder =  mock(KafkaMessageEncoder.class);
+    private final KafkaMessageEncoderBase<ILoggingEvent> encoder =  mock(KafkaMessageEncoderBase.class);
     private final KeyingStrategy<ILoggingEvent> keyingStrategy =  mock(KeyingStrategy.class);
     @SuppressWarnings("unchecked")
     private final DeliveryStrategy deliveryStrategy =  mock(DeliveryStrategy.class);
@@ -62,7 +63,7 @@ public class KafkaAppenderTest {
         unit.stop();
         assertFalse("isStopped", unit.isStarted());
         assertThat(ctx.getStatusManager().getCopyOfStatusList(), empty());
-        verifyZeroInteractions(encoder, keyingStrategy, deliveryStrategy);
+        verifyZeroInteractions(keyingStrategy, deliveryStrategy);
     }
 
     @Test

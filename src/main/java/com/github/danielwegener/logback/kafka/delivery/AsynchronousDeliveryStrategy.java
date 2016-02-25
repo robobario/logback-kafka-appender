@@ -15,14 +15,7 @@ public class AsynchronousDeliveryStrategy implements DeliveryStrategy {
     public <K, V, E> boolean send(Producer<K, V> producer, ProducerRecord<K, V> record, final E event,
                                   final FailedDeliveryCallback<E> failedDeliveryCallback) {
         try {
-            producer.send(record, new Callback() {
-                @Override
-                public void onCompletion(RecordMetadata metadata, Exception exception) {
-                    if (exception != null) {
-                        failedDeliveryCallback.onFailedDelivery(event, exception);
-                    }
-                }
-            });
+            producer.send(record);
             return true;
         } catch (BufferExhaustedException e) {
             failedDeliveryCallback.onFailedDelivery(event, e);

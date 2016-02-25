@@ -1,13 +1,41 @@
 package com.github.danielwegener.logback.kafka;
 
+import static org.apache.kafka.clients.producer.ProducerConfig.ACKS_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.BATCH_SIZE_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.BLOCK_ON_BUFFER_FULL_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.BOOTSTRAP_SERVERS_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.BUFFER_MEMORY_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.CLIENT_ID_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.COMPRESSION_TYPE_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.CONNECTIONS_MAX_IDLE_MS_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.LINGER_MS_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.MAX_BLOCK_MS_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION;
+import static org.apache.kafka.clients.producer.ProducerConfig.MAX_REQUEST_SIZE_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.METADATA_FETCH_TIMEOUT_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.METADATA_MAX_AGE_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.METRICS_NUM_SAMPLES_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.METRICS_SAMPLE_WINDOW_MS_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.METRIC_REPORTER_CLASSES_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.PARTITIONER_CLASS_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.RECEIVE_BUFFER_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.RETRIES_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.RETRY_BACKOFF_MS_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.SEND_BUFFER_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.TIMEOUT_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG;
+
+import ch.qos.logback.core.Context;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.spi.AppenderAttachable;
 import com.github.danielwegener.logback.kafka.delivery.BlockingDeliveryStrategy;
 import com.github.danielwegener.logback.kafka.delivery.DeliveryStrategy;
-import com.github.danielwegener.logback.kafka.encoding.KafkaMessageEncoder;
+import com.github.danielwegener.logback.kafka.encoding.KafkaMessageEncoderBase;
 import com.github.danielwegener.logback.kafka.keying.KeyingStrategy;
 import com.github.danielwegener.logback.kafka.keying.RoundRobinKeyingStrategy;
-import static org.apache.kafka.clients.producer.ProducerConfig.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +49,7 @@ public abstract class KafkaAppenderConfig<E> extends UnsynchronizedAppenderBase<
 
     protected String topic = null;
 
-    protected KafkaMessageEncoder<E> encoder = null;
+    protected KafkaMessageEncoderBase<E> encoder = null;
     protected KeyingStrategy<? super E> keyingStrategy = null;
     protected DeliveryStrategy deliveryStrategy;
 
@@ -98,7 +126,7 @@ public abstract class KafkaAppenderConfig<E> extends UnsynchronizedAppenderBase<
         return errorFree;
     }
 
-    public void setEncoder(KafkaMessageEncoder<E> layout) {
+    public void setEncoder(KafkaMessageEncoderBase<E> layout) {
         this.encoder = layout;
     }
 
@@ -142,5 +170,16 @@ public abstract class KafkaAppenderConfig<E> extends UnsynchronizedAppenderBase<
     }
 
 
+    @Override
+    public void setContext(Context context) {
+        encoder.setContext(context);
+        super.setContext(context);
+    }
 
+
+    @Override
+    public void start() {
+        encoder.start();
+        super.start();
+    }
 }
